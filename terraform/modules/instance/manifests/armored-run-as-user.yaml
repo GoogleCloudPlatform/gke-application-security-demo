@@ -1,0 +1,64 @@
+# Copyright 2018 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This pod is running app.go which can read a file from disk, read /proc/cpuinfo,
+# read the hostname, and a few other things
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: armored-hello-user
+  labels:
+    app: armored-hello-user
+spec:
+  selector:
+    matchLabels:
+      app: armored-hello-user
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: armored-hello-user
+      # This annotation tells the spec where to find the AppArmor profile that removes unnecessary
+      # container privileges not needed to run app.go
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/armored-hello-user: localhost/armored-hello-user
+    spec:
+      # prevent the pod from using the default service account credentials
+      automountServiceAccountToken: false
+      containers:
+      - name: armored-hello-user
+        image: gcr.io/pso-examples/hello-run-as-user:1.0.1
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: armored-hello-user
+  labels:
+    app: armored-hello-user
+  annotations:
+    cloud.google.com/load-balancer-type: "Internal"
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app: armored-hello-user
+  sessionAffinity: None
+  type: LoadBalancer
+

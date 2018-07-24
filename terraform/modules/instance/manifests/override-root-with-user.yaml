@@ -1,0 +1,60 @@
+# Copyright 2018 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-override
+  labels:
+    app: hello-override
+spec:
+  selector:
+    matchLabels:
+      app: hello-override
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello-override
+    spec:
+      # prevent the pod from using the default service account credentials
+      automountServiceAccountToken: false
+      containers:
+      - name: hello-override
+        image: gcr.io/pso-examples/hello-run-as-root:1.0.1
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8080
+        securityContext:
+          runAsUser: 65534
+          runAsGroup: 65534
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-override
+  labels:
+    app: hello-override
+  annotations:
+    cloud.google.com/load-balancer-type: "Internal"
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app: hello-override
+  sessionAffinity: None
+  type: LoadBalancer
