@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Make will use bash instead of sh
 SHELL := /usr/bin/env bash
 
-# All is the first target so it will get picked up when you just run 'make' on its own
+# All is the first target in the file so it will get picked up when you just run 'make' on its own
 all: check_shell check_python check_golang check_terraform check_docker check_base_files check_headers check_trailing_whitespace
 
+# The .PHONY directive tells make that this isn't a real target and so
+# the presence of a file named 'check_shell' won't cause this target to stop
+# working
 .PHONY: check_shell
 check_shell:
 	@source test/make.sh && check_shell
@@ -49,46 +53,51 @@ check_shebangs:
 check_trailing_whitespace:
 	@source test/make.sh && check_trailing_whitespace
 
-.PHONY: build_app
-build_app:
-	docker run --rm --mount type=bind,source="$$(pwd)"/containers,target=/gosrc -w /gosrc golang:1.10.3 go build -v -o app
-
-.PHONY: build_root_image
-build_root_image:
-	cd containers && docker build -t hello-run-as-root:1.0.0 -f root_Dockerfile .
-
-.PHONY: build_user_image
-build_user_image:
-	cd containers && docker build -t hello-run-as-user:1.0.0 -f user_Dockerfile .
-
-.PHONY: push_root_image
-push_root_image:
-	docker tag hello-run-as-root:1.0.0 gcr.io/"$$(gcloud config get-value project)"/hello-run-as-root:1.0.0
-	docker push gcr.io/"$$(gcloud config get-value project)"/hello-run-as-root:1.0.0
-
-.PHONY: push_user_image
-push_user_image:
-	docker tag hello-run-as-user:1.0.0 gcr.io/"$$(gcloud config get-value project)"/hello-run-as-user:1.0.0
-	docker push gcr.io/"$$(gcloud config get-value project)"/hello-run-as-user:1.0.0
-
 .PHONY: check_headers
 check_headers:
 	@echo "Checking file headers"
 	@python test/verify_boilerplate.py
 
+.PHONY: build_app
+build_app:
+        docker run --rm --mount type=bind,source="$$(pwd)"/containers,target=/gosrc -w /gosrc golang:1.10.3 go build -v -o app
+
+.PHONY: build_root_image
+build_root_image:
+        cd containers && docker build -t hello-run-as-root:1.0.0 -f root_Dockerfile .
+
+.PHONY: build_user_image
+build_user_image:
+        cd containers && docker build -t hello-run-as-user:1.0.0 -f user_Dockerfile .
+
+.PHONY: push_root_image
+push_root_image:
+        docker tag hello-run-as-root:1.0.0 gcr.io/"$$(gcloud config get-value project)"/hello-run-as-root:1.0.0
+        docker push gcr.io/"$$(gcloud config get-value project)"/hello-run-as-root:1.0.0
+
+.PHONY: push_user_image
+push_user_image:
+        docker tag hello-run-as-user:1.0.0 gcr.io/"$$(gcloud config get-value project)"/hello-run-as-user:1.0.0
+        docker push gcr.io/"$$(gcloud config get-value project)"/hello-run-as-user:1.0.0
+
+.PHONY: check_headers
+check_headers:
+        @echo "Checking file headers"
+        @python test/verify_boilerplate.py
+
 .PHONY: setup-project
 setup-project:
-	# Enables the Google Cloud APIs needed
-	./enable-apis.sh
-	# Runs generate-tfvars.sh
-	./generate-tfvars.sh
+        # Enables the Google Cloud APIs needed
+        ./enable-apis.sh
+        # Runs generate-tfvars.sh
+        ./generate-tfvars.sh
 
 .PHONY: tf-apply
 tf-apply:
-	# Downloads the terraform providers and applies the configuration
-	cd terraform && terraform init && terraform apply
+        # Downloads the terraform providers and applies the configuration
+        cd terraform && terraform init && terraform apply
 
 .PHONY: tf-destroy
 tf-destroy:
-	# Downloads the terraform providers and applies the configuration
-	cd terraform && terraform destroy
+        # Downloads the terraform providers and applies the configuration
+        cd terraform && terraform destroy
