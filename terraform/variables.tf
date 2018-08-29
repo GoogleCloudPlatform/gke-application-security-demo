@@ -39,6 +39,16 @@ variable "project" {
   type        = "string"
 }
 
+variable "vpc_name" {
+  description = "The name used for vps, network and subnetwork."
+  type        = "string"
+}
+
+variable "execution_id" {
+  description = "A random string used as as suffix for resources."
+  type        = "string"
+}
+
 /*
 Optional Variables
 Defaults will be used for these, if not overridden at runtime.
@@ -78,12 +88,6 @@ variable "master_cidr_block" {
   description = "The CIDR from which to allocate master IPs"
   type        = "string"
   default     = "10.0.90.0/28"
-}
-
-variable "min_master_version" {
-  description = "The minimum version to use for cluster masters"
-  type        = "string"
-  default     = "1.10"
 }
 
 variable "node_machine_type" {

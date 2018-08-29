@@ -95,5 +95,6 @@ tf-apply:
 
 .PHONY: tf-destroy
 tf-destroy:
-				# Downloads the terraform providers and applies the configuration
-				cd terraform && terraform destroy -auto-approve
+				# Wait for the related backend services to be deleted and then
+				# delete all the resources created by terraform
+				./waitfor_svc_deleted.sh && cd terraform && terraform destroy -auto-approve

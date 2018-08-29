@@ -39,6 +39,11 @@ variable "zone" {
   type        = "string"
 }
 
+variable "execution_id" {
+  description = "A random string used as as suffix for resources."
+  type        = "string"
+}
+
 variable "tags" {
   description = "the instance tags"
   type        = "list"
@@ -68,5 +73,4 @@ variable "grant_cluster_admin" {
 
 variable "vpc_name" {
   type    = "string"
-  default = "kube-net"
 }

@@ -39,5 +39,9 @@ variable "tags" {
 
 variable "vpc_name" {
   type    = "string"
-  default = "kube-net"
+}
+
+variable "execution_id" {
+  description = "A random string used as as suffix for resources."
+  type        = "string"
 }

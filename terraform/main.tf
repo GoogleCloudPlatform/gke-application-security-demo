@@ -14,13 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// Provides access to available Google Container Engine versions in a zone for a given project.
+// https://www.terraform.io/docs/providers/google/d/google_container_engine_versions.html
+data "google_container_engine_versions" "on-prem" {
+  zone    = "${var.zone}"
+  project = "${var.project}"
+}
+
 // Create the network to be used by the cluster and bastion host
 module "network" {
   source   = "./modules/network"
   project  = "${var.project}"
   region   = "${var.region}"
-  vpc_name = "kube-net"
+  vpc_name = "${var.vpc_name}-${var.execution_id}"
   tags     = "${var.bastion_tags}"
+  execution_id = "${var.execution_id}"
 }
 
 // Create the necessary firewalls to allow ssh to the bastion host
@@ -29,31 +37,34 @@ module "firewall" {
   project  = "${var.project}"
   vpc      = "${module.network.network_self_link}"
   net_tags = "${var.bastion_tags}"
+  execution_id = "${var.execution_id}"
 }
 
 // Create and configure the bastion host used to access the private cluster
 module "bastion" {
   source                = "./modules/instance"
   project               = "${var.project}"
-  hostname              = "gke-tutorial-bastion"
+  hostname              = "gke-application-security-bastion"
   machine_type          = "${var.bastion_machine_type}"
   zone                  = "${var.zone}"
   tags                  = "${var.bastion_tags}"
   cluster_subnet        = "${module.network.subnet_self_link}"
-  cluster_name          = "${var.cluster_name}"
+  cluster_name          = "${var.cluster_name}-${var.execution_id}"
   service_account_email = "${google_service_account.admin.email}"
   grant_cluster_admin   = "1"
+  vpc_name              = "${var.vpc_name}-${var.execution_id}"
+  execution_id          = "${var.execution_id}"
 }
 
 // Create the Kubernetes engine cluster that we will launch the demonstration
 // pods in
 resource "google_container_cluster" "primary" {
-  name               = "${var.cluster_name}"
+  name               = "${var.cluster_name}-${var.execution_id}"
   project            = "${var.project}"
   zone               = "${var.zone}"
   network            = "${module.network.network_self_link}"
   subnetwork         = "${module.network.subnet_self_link}"
-  min_master_version = "${var.min_master_version}"
+  min_master_version = "${data.google_container_engine_versions.on-prem.latest_master_version}"
   initial_node_count = "${var.initial_node_count}"
 
   lifecycle {
@@ -98,7 +109,7 @@ resource "google_container_cluster" "primary" {
   master_authorized_networks_config {
     cidr_blocks = [
       {
-        display_name = "gke-tutorial-bastion"
+        display_name = "gke-application-security-bastion"
         cidr_block   = "${module.bastion.external_ip}/32"
       },
     ]

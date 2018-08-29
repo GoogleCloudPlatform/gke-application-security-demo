@@ -83,7 +83,7 @@ In order to use the code in this demo you will need access to the following tool
 * Terraform v0.11.7
 * gcloud v206.0.0
 * kubectl v1.10.4
-* Kubernetes Engine v1.10
+* Kubernetes Engine - latest released version
 
 ## Deployment
 
@@ -184,7 +184,7 @@ Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
 Once that has completed, remote into the bastion instance using SSH:
 
 ```console
-gcloud compute ssh gke-tutorial-bastion
+gcloud compute ssh gke-application-security-bastion
 ```
 
 Apply the manifests for the cluster using the deployment script:
@@ -253,11 +253,11 @@ UID: 0
 GID: 0
 You have read the root.txt file.
 You have read the user.txt file.
-processor	: 0
-vendor_id	: GenuineIntel
-cpu family	: 6
-model		: 63
-model name	: Intel(R) Xeon(R) CPU @ 2.30GHz
+processor : 0
+vendor_id : GenuineIntel
+cpu family  : 6
+model   : 63
+model name  : Intel(R) Xeon(R) CPU @ 2.30GHz
 ```
 
 and it clearly shows that it is running as `root` and can perform all actions.
