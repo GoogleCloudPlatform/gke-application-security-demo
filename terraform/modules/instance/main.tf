@@ -96,7 +96,7 @@ resource "google_compute_instance" "instance" {
     command = <<EOF
         READY=""
         for i in $(seq 1 18); do
-          if gcloud compute ssh ${var.hostname} --command uptime; then
+          if gcloud compute ssh ${var.hostname} --quiet --command uptime; then
             READY="yes"
             break;
           fi

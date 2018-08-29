@@ -26,16 +26,6 @@ echo "- container.googleapis.com"
 echo "- cloudbuild.googleapis.com"
 echo
 
-read -p "Would you like to proceed? [y/n]: " -n 1 -r
-echo
-# Require a "Y" or "y" to proceed. Otherwise abort.
-if [[ ! "$REPLY" =~ ^[Yy]$ ]]
-then
-    # Do not continue. Do not enable the APIs.
-    echo "Exiting without making changes."
-    exit 1
-fi
-
 # Enable Compute Engine, Kubernetes Engine, and Container Builder
 gcloud services enable compute.googleapis.com \
 container.googleapis.com \
