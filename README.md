@@ -163,7 +163,7 @@ Next, apply the terraform configuration with:
 make tf-apply
 ```
 
-When prompted if you want to deploy the plan, review the generated plan and enter `yes` to deploy the environment.  This will take a few minutes to complete.  The following is the last few lines of successful output.
+This will take a few minutes to complete.  The following is the last few lines of successful output.
 
 ```console
 ...snip...
@@ -379,7 +379,7 @@ After that script completes, log out of the bastion host and run the following t
 make tf-destroy
 ```
 
-After answering `yes`, Terraform will destroy the environment and indicate when it has completed:
+Terraform will destroy the environment and indicate when it has completed:
 
 ```console
 ...snip...
