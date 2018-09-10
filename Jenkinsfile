@@ -39,7 +39,7 @@ spec:
     - cat
     tty: true
     volumeMounts:
-    # Mount the docker.sock file so we can communicate wth the local docker
+    # Mount the docker.sock file so we can communicate with the local docker
     # daemon
     - name: docker-sock-volume
       mountPath: /var/run/docker.sock
@@ -70,6 +70,7 @@ spec:
 
   stages {
 
+    // Run all of the source code linting tools
     stage('Lint') {
       steps {
         container('k8s-node') {
@@ -100,6 +101,12 @@ spec:
         }
     }
 
+   /**
+   Our terraform steps are wrapped up in a Makefile
+   We need to set USER=jenkins so gcloud doesn't get setup for root
+   We need to login to the instance with jenkins-deploy-dev-infra so it has the correct permissions
+   The default instance service account is not privileged enough
+   **/
    stage('Create') {
       steps {
         container('k8s-node') {
@@ -113,6 +120,7 @@ spec:
       }
     }
 
+    // Confirm that our cluster is setup correctly by testing its output
     stage('Validate') {
       steps {
         container('k8s-node') {
@@ -123,6 +131,7 @@ spec:
 
   }
 
+  // No matter what happens always clean up
   post {
     always {
       container('k8s-node') {
