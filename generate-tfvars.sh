@@ -82,7 +82,6 @@ if [[ -z "${PROJECT_DIR}" ]]; then
     exit 1;
 fi
 
-
 (
 cd "${PROJECT_DIR}"
 
@@ -100,6 +99,8 @@ fi
 project="${PROJECT}"
 region="${REGION}"
 zone="${ZONE}"
+vpc_name="kube-net"
+execution_id="$RANDOM"
 EOF
 )
 

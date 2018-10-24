@@ -33,7 +33,7 @@ metadata:
 spec:
   containers:
   - name: k8s-node
-    image: gcr.io/pso-helmsman-cicd/jenkins-k8s-node:1.1.0
+    image: gcr.io/pso-helmsman-cicd/jenkins-k8s-node:1.3.0
     imagePullPolicy: Always
     command:
     - cat
@@ -93,29 +93,28 @@ spec:
                 env.KEYFILE = GOOGLE_APPLICATION_CREDENTIALS
             }
           // Setup gcloud service account access
-          sh "USER=jenkins gcloud auth activate-service-account --key-file=${env.KEYFILE}"
-          sh "USER=jenkins gcloud config set compute/zone ${env.CLUSTER_ZONE}"
-          sh "USER=jenkins gcloud config set core/project ${env.PROJECT_ID}"
-          sh "USER=jenkins gcloud config set compute/region ${env.REGION}"
+          sh "gcloud auth activate-service-account --key-file=${env.KEYFILE}"
+          sh "gcloud config set compute/zone ${env.CLUSTER_ZONE}"
+          sh "gcloud config set core/project ${env.PROJECT_ID}"
+          sh "gcloud config set compute/region ${env.REGION}"
          }
         }
     }
 
    /**
    Our terraform steps are wrapped up in a Makefile
-   We need to set USER=jenkins so gcloud doesn't get setup for root
    We need to login to the instance with jenkins-deploy-dev-infra so it has the correct permissions
    The default instance service account is not privileged enough
    **/
    stage('Create') {
       steps {
         container('k8s-node') {
-            sh 'USER=jenkins make setup-project'
-            sh 'USER=jenkins make tf-apply'
-            sh 'USER=jenkins gcloud compute scp  --recurse terraform/modules/instance/manifests jenkins-deploy-dev-infra@gke-tutorial-bastion:'
-            sh 'USER=jenkins gcloud compute scp  --recurse terraform/modules/instance/scripts jenkins-deploy-dev-infra@gke-tutorial-bastion:'
-            sh 'USER=jenkins gcloud compute ssh jenkins-deploy-dev-infra@gke-tutorial-bastion --command \'source /etc/profile\''
-            sh 'USER=jenkins gcloud compute ssh jenkins-deploy-dev-infra@gke-tutorial-bastion --command \'scripts/deploy.sh\''
+            sh 'make setup-project'
+            sh 'make tf-apply'
+            sh 'gcloud compute scp  --recurse terraform/modules/instance/manifests jenkins-deploy-dev-infra@gke-application-security-bastion:'
+            sh 'gcloud compute scp  --recurse terraform/modules/instance/scripts jenkins-deploy-dev-infra@gke-application-security-bastion:'
+            sh 'gcloud compute ssh jenkins-deploy-dev-infra@gke-application-security-bastion --command \'source /etc/profile\''
+            sh 'gcloud compute ssh jenkins-deploy-dev-infra@gke-application-security-bastion --command \'scripts/deploy.sh\''
         }
       }
     }
@@ -124,19 +123,27 @@ spec:
     stage('Validate') {
       steps {
         container('k8s-node') {
-             sh 'USER=jenkins gcloud compute ssh jenkins-deploy-dev-infra@gke-tutorial-bastion --command \'scripts/validate.sh\''
+             sh 'gcloud compute ssh jenkins-deploy-dev-infra@gke-application-security-bastion --command \'scripts/validate.sh\''
         }
       }
     }
 
+    // Teardown the resources created during the Create stage
+    stage('Teardown') {
+      steps {
+        container('k8s-node') {
+             sh 'gcloud compute ssh jenkins-deploy-dev-infra@gke-application-security-bastion --command \'scripts/teardown.sh\''
+        }
+      }
+    }
   }
 
   // No matter what happens always clean up
   post {
     always {
       container('k8s-node') {
-        sh 'USER=jenkins make tf-destroy'
-        sh 'USER=jenkins gcloud auth revoke'
+        sh 'make tf-destroy'
+        sh 'gcloud auth revoke'
       }
     }
   }

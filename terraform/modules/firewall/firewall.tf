@@ -17,7 +17,7 @@ limitations under the License.
 // https://www.terraform.io/docs/providers/google/r/compute_firewall.html
 // Adding a firewall rule to allow access to the bastion host from anywhere
 resource "google_compute_firewall" "bastion-ssh" {
-  name          = "gke-demo-bastion-fw"
+  name          = "gke-demo-bastion-fw-${var.execution_id}"
   network       = "${var.vpc}"
   direction     = "INGRESS"
   project       = "${var.project}"
