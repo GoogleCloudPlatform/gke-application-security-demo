@@ -72,5 +72,5 @@ variable "grant_cluster_admin" {
 }
 
 variable "vpc_name" {
-  type    = "string"
+  type = "string"
 }
