@@ -38,7 +38,7 @@ variable "tags" {
 }
 
 variable "vpc_name" {
-  type    = "string"
+  type = "string"
 }
 
 variable "execution_id" {
