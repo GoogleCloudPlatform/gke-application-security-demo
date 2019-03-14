@@ -74,6 +74,9 @@ gcloud init
 ```
 
 ### Tools
+
+In order to use the code in this demo, you will need access to following below tools: 
+
 1. [Terraform >= 0.11.7](https://www.terraform.io/downloads.html)
 2. [Google Cloud SDK version >= 204.0.0](https://cloud.google.com/sdk/docs/downloads-versioned-archives)
 3. [kubectl matching the latest GKE version](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
