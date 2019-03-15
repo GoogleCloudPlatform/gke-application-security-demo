@@ -14,7 +14,7 @@
   * [Tools](#tools)
 * [Deployment](#deployment)
   * [Authenticate gcloud](#authenticate-gcloud)
-  * [Configure gcloud settings](#configuring-gcloud-settings)
+  * [Configure gcloud settings](#configure-gcloud-settings)
   * [Setup this project](#setup-this-project)
   * [Provisioning the Kubernetes Engine Cluster](#provisioning-the-kubernetes-engine-cluster)
 * [Validation](#validation)
