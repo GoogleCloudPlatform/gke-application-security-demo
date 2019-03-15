@@ -53,9 +53,7 @@ This demonstration will deploy five containers in a private cluster:
 1. A container with a lenient AppArmor profile that allows all non-root permissions.
 1. A container with an AppArmor profile applied to disallow the `/proc/cpuinfo` endpoint from being properly read
 
-Each container will be exposed outside the clusters as an internal load balancer.
-
-The containers themselves are running a simple Go web server with five endpoints. The endpoints differ in terms of the privileges they need to complete the request. A non-root user cannot read a file owned by root. The `nobody` user cannot read `/proc/cpuinfo` when that privilege is being blocked by AppArmor.
+Each container will be exposed outside the clusters as an internal load balancer. The containers themselves are running a simple Go web server with five endpoints. The endpoints differ in terms of the privileges they need to complete the request. A non-root user cannot read a file owned by root. The `nobody` user cannot read `/proc/cpuinfo` when that privilege is being blocked by AppArmor.
 
 1. An endpoint to get the container's hostname
 1. An endpoint to get the username, UID, and GID of identity running the server
