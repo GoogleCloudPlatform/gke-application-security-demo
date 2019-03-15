@@ -14,7 +14,7 @@
   * [Tools](#tools)
 * [Deployment](#deployment)
   * [Authenticate gcloud](#authenticate-gcloud)
-  * [Configure gcloud settings](#configure-gcloud-settings)
+  * [Configure gcloud settings](#configuring-gcloud-settings)
   * [Setup this project](#setup-this-project)
   * [Provisioning the Kubernetes Engine Cluster](#provisioning-the-kubernetes-engine-cluster)
 * [Validation](#validation)
@@ -53,7 +53,9 @@ This demonstration will deploy five containers in a private cluster:
 1. A container with a lenient AppArmor profile that allows all non-root permissions.
 1. A container with an AppArmor profile applied to disallow the `/proc/cpuinfo` endpoint from being properly read
 
-Each container will be exposed outside the clusters as an internal load balancer. The containers themselves are running a simple Go web server with five endpoints. The endpoints differ in terms of the privileges they need to complete the request. A non-root user cannot read a file owned by root. The `nobody` user cannot read `/proc/cpuinfo` when that privilege is being blocked by AppArmor.
+Each container will be exposed outside the clusters as an internal load balancer.
+
+The containers themselves are running a simple Go web server with five endpoints. The endpoints differ in terms of the privileges they need to complete the request. A non-root user cannot read a file owned by root. The `nobody` user cannot read `/proc/cpuinfo` when that privilege is being blocked by AppArmor.
 
 1. An endpoint to get the container's hostname
 1. An endpoint to get the username, UID, and GID of identity running the server
@@ -65,16 +67,14 @@ Each container will be exposed outside the clusters as an internal load balancer
 
 ### Configure gcloud
 
-When using Cloud Shell execute the following command in order to setup gcloud cli. When executing this command please setup your region and zone.
+All the tools for the demo are installed. When using Cloud Shell execute the following
+command in order to setup gcloud cli. When executing this command please setup your region and zone.
 
 ```console
 gcloud init
 ```
 
 ### Tools
-
-In order to use the code in this demo, you will need access to following below tools: 
-
 1. [Terraform >= 0.11.7](https://www.terraform.io/downloads.html)
 2. [Google Cloud SDK version >= 204.0.0](https://cloud.google.com/sdk/docs/downloads-versioned-archives)
 3. [kubectl matching the latest GKE version](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
