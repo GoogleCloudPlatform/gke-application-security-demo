@@ -23,7 +23,7 @@ resource "google_service_account" "admin" {
 }
 
 resource "google_project_iam_member" "kube-api-admin" {
-  project = "${var.project}"
+  project = var.project
   role    = "roles/container.admin"
   member  = "serviceAccount:${google_service_account.admin.email}"
 }

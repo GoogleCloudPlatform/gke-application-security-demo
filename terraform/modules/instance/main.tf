@@ -37,7 +37,7 @@ echo "gcloud container clusters get-credentials $${cluster_name} \
 echo "$${admin_binding}" >> /etc/profile
 EOF
 
-  vars {
+  vars = {
     cluster_name = "${var.cluster_name}"
     zone         = "${var.zone}"
     project      = "${var.project}"
