@@ -68,7 +68,7 @@ resource "google_container_cluster" "primary" {
   initial_node_count = var.initial_node_count
 
   lifecycle {
-    ignore_changes = ["ip_allocation_policy.services_secondary_range_name[0]"]
+    ignore_changes = [ip_allocation_policy.0.services_secondary_range_name]
   }
 
   additional_zones = []
