@@ -14,19 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Configures the default project and zone for underlying Google Cloud API calls
-provider "google" {
-  project = var.project
-  zone    = var.zone
-  version = "~> 2.10.0"
-}
-
-// Pins the version of the "template" provider
-provider "template" {
-  version = "~> 2.1.2"
-}
-
-// Pins the version of the "null" provider
-provider "null" {
-  version = "~> 2.1.2"
+terraform {
+  required_version = ">= 0.12"
 }
