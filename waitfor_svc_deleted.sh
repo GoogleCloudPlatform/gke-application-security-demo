@@ -24,7 +24,7 @@ REGION="$(gcloud config get-value compute/region)"
 STR="$(gcloud compute backend-services list | awk '{print $1}' | awk '!/NAME/')"
 
 # convert the names of backend services to a list
-ARR=$(echo $STR | tr " " "\n")
+ARR="$(echo "${STR}" | tr ' ' '\n')"
 
 # loop all the backend services
 for ITEM in $ARR
@@ -34,34 +34,35 @@ do
     if [[ $RES == *"description"* ]]; then
 
         # get the name of the backend service "group" (ie k8s-ig--d0bf239d98a9d918)
-        IFS=' ' read var1 var2 var3 <<< $RES
+        # shellcheck disable=SC2034
+        IFS=' ' read -r var1 var2 var3 <<< "$RES"
         NAME=${var2##*/}
 
         # wait for all backend services to be deleted in that "group" (max time 5 minutes)
         RETRIES_REMAINING=30
-        while [[ $(gcloud compute backend-services list | grep $NAME) != "" ]]; do
+        while [[ $(gcloud compute backend-services list | grep "$NAME") != "" ]]; do
             if [[ $RETRIES_REMAINING -eq 0 ]]; then
               echo "Retry limit exceeded; exiting..."
               exit 1
             fi
             echo "Wait for the BACKEND $NAME being deleted."
-            RETRIES_REMAINING=$(($RETRIES_REMAINING - 1))
+            RETRIES_REMAINING=$(("$RETRIES_REMAINING" - 1))
             sleep 10
         done
         echo "Service $NAME has been deleted."
 
         # delete the particular firewall rule (ie k8s-d0bf239d98a9d918-node-hc)
-        $(gcloud compute firewall-rules delete ${NAME/-ig-/}-node-hc --quiet >/dev/null 2>&1)
+        gcloud compute firewall-rules delete "${NAME/-ig-/}-node-hc" --quiet >/dev/null 2>&1
 
         # wait for the firewall rules to be deleted (max time 5 minutes)
         RETRIES_REMAINING=30
-        while [[ $(gcloud compute firewall-rules list --format=json | grep ${NAME/-ig-/}) != "" ]]; do
+        while [[ $(gcloud compute firewall-rules list --format=json | grep "${NAME/-ig-/}") != "" ]]; do
             if [[ $RETRIES_REMAINING -eq 0 ]]; then
               echo "Retry limit exceeded; exiting..."
               exit 1
             fi
             echo "Wait for the Firewall ${NAME/-ig-/} being deleted."
-            RETRIES_REMAINING=$(($RETRIES_REMAINING - 1))
+            RETRIES_REMAINING=$(("$RETRIES_REMAINING" - 1))
             sleep 10
         done
         echo "Firewall ${NAME/-ig-/} has been deleted."
