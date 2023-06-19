@@ -23,7 +23,7 @@ provider "google" {
 
 // Pins the version of the "template" provider
 provider "template" {
-  version = "~> 2.1.2"
+  version = "~> 2.2.0"
 }
 
 // Pins the version of the "null" provider
